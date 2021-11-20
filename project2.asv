@@ -10,7 +10,10 @@
 %       Time Series analysis on a synthetic data set using Piecewise
 %       Aggregate Approximation, Symbolic Aggregate Approximation representations
 %       and classification with Euclidean Distance and Manhattan Distance
-% 
+%
+% References:
+%       CSE454 Fall 2021 Matlab Drive
+%       
 
 
 clc;
@@ -41,51 +44,67 @@ function main()
     paaTest = paaGen(c,dataTest);
 %     paaplot(paaTrain,dataTrain,c,1);
     
-    sax = saxGen(paaTrain,dataTrain);
+    sax = saxGen(paaTrain,dataTrain)
     
-    baseEuclideanAcc = classifyAcc(dataTrain,dataTest,1,trainLabel,testLabel)
-    paaEuclideanAcc = classifyAcc(paaTrain,paaTest,1,trainLabel,testLabel)
-    baseManhattanAcc = classifyAcc(dataTrain,dataTest,0,trainLabel,testLabel)
-    paaManhattanAcc = classifyAcc(paaTrain,paaTest,0,trainLabel,testLabel)
+    [baseEuclideanAcc, beConf] = classifyAcc(dataTrain,dataTest,1,trainLabel,testLabel);
+    [paaEuclideanAcc, peConf] = classifyAcc(paaTrain,paaTest,1,trainLabel,testLabel);
+    [baseManhattanAcc, bmConf] = classifyAcc(dataTrain,dataTest,0,trainLabel,testLabel);
+    [paaManhattanAcc, pmConf] = classifyAcc(paaTrain,paaTest,0,trainLabel,testLabel);
+
+    baseEuclideanAcc
+    paaEuclideanAcc
 
 end
 
-
+%{
+    Plots PAA values against original data set
+    Inputs:
+            paa: Matrix of PAA values
+            data: Matrix of original data
+            c: Number of columns/separations using in PAA representation
+            i: Matrix index used to generate plot
+    Outputs:
+            None
+%}
 function  paaplot(paa,data,c,i)
-    %UNTITLED4 Summary of this function goes here
-s=size(data);
+    s=size(data);
     dt=s(2);
-ln=dt/c;
-ln=ceil(ln);
-paax=[];
-paay=[];
-z=1;
-n=1;
-paax(z)=0;
-paay(z)=paa(i,n);
-s=size(data);
-z=z+1;
-for n=2:c
-    paax(z)=paax(z-1)+ln;
-    paay(z)=paa(i,n-1);
-    z=z+1;
-    paax(z)=paax(z-1);
+    ln=dt/c;
+    ln=ceil(ln);
+    paax=[];
+    paay=[];
+    z=1;
+    n=1;
+    paax(z)=0;
     paay(z)=paa(i,n);
+    s=size(data);
     z=z+1;
-end
-plot(paax,paay);
-hold on
-t=linspace(0,s(2),s(2));
-scatter(t,data(i,:),"filled")
-ylim([0,100]);
+    for n=2:c
+        paax(z)=paax(z-1)+ln;
+        paay(z)=paa(i,n-1);
+        z=z+1;
+        paax(z)=paax(z-1);
+        paay(z)=paa(i,n);
+        z=z+1;
+    end
+    plot(paax,paay);
+    hold on
+    t=linspace(0,s(2),s(2));
+    scatter(t,data(i,:),"filled")
+    ylim([0,100]);
 end
 
 
 %{
     Assigns temporal data to PAA Representation
+    Inputs:
+            c: Number of columns to divide the data
+            data: Matrix of data to be assigned PAA values
+    Ouputs:
+            paa: Matrix of PAA values
 %}
 function paa = paaGen(c, data)
-    s =size(data);
+    s = size(data);
     time = s(2);
     sect = time/c;
     sect = ceil(sect);
@@ -181,8 +200,9 @@ end
     Outputs:
             acc: Accuracy of classification using Euclidean/Manhattan
                  Distance
+            conf: Confusion Matrix generated from comparison
 %}
-function acc = classifyAcc(train,test,euc,trainLabel,testLabel)
+function [acc, conf] = classifyAcc(train,test,euc,trainLabel,testLabel)
     for i = 1:length(train)
         for j = 1:length(test)
             if euc==1
@@ -203,7 +223,7 @@ function acc = classifyAcc(train,test,euc,trainLabel,testLabel)
         end
     end
     acc = sum/length(cIndex);
-%     c = confusionmat(trainLabel,class);
+    conf = confusionmat(trainLabel,class);
 %     confusionchart(c)
 end
 

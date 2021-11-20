@@ -42,14 +42,24 @@ function main()
     c=10;
     paaTrain = paaGen(c,dataTrain);
     paaTest = paaGen(c,dataTest);
+    
 %     paaplot(paaTrain,dataTrain,c,1);
     
     sax = saxGen(paaTrain,dataTrain)
     
-    baseEuclideanAcc = classifyAcc(dataTrain,dataTest,1,trainLabel,testLabel)
-    paaEuclideanAcc = classifyAcc(paaTrain,paaTest,1,trainLabel,testLabel)
-    baseManhattanAcc = classifyAcc(dataTrain,dataTest,0,trainLabel,testLabel)
-    paaManhattanAcc = classifyAcc(paaTrain,paaTest,0,trainLabel,testLabel)
+    [baseEuclideanAcc, beConf] = classifyAcc(dataTrain,dataTest,1,trainLabel,testLabel);
+    [paaEuclideanAcc, peConf] = classifyAcc(paaTrain,paaTest,1,trainLabel,testLabel);
+    [baseManhattanAcc, bmConf] = classifyAcc(dataTrain,dataTest,0,trainLabel,testLabel);
+    [paaManhattanAcc, pmConf] = classifyAcc(paaTrain,paaTest,0,trainLabel,testLabel);
+
+    baseEuclideanAcc
+%     confusionchart(beConf);
+    paaEuclideanAcc
+%     confusionchart(peConf);
+    baseManhattanAcc
+%     confusionchart(bmConf);
+    paaManhattanAcc
+%     confusionchart(pmConf);
 
 end
 
@@ -197,8 +207,9 @@ end
     Outputs:
             acc: Accuracy of classification using Euclidean/Manhattan
                  Distance
+            conf: Confusion Matrix generated from comparison
 %}
-function acc = classifyAcc(train,test,euc,trainLabel,testLabel)
+function [acc, conf] = classifyAcc(train,test,euc,trainLabel,testLabel)
     for i = 1:length(train)
         for j = 1:length(test)
             if euc==1
@@ -219,7 +230,7 @@ function acc = classifyAcc(train,test,euc,trainLabel,testLabel)
         end
     end
     acc = sum/length(cIndex);
-%     c = confusionmat(trainLabel,class);
+    conf = confusionmat(trainLabel,class);
 %     confusionchart(c)
 end
 
