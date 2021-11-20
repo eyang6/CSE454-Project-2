@@ -42,8 +42,8 @@ function main()
     c=10;
     paaTrain = paaGen(c,dataTrain);
     paaTest = paaGen(c,dataTest);
-    
-%     paaplot(paaTrain,dataTrain,c,1);
+
+    paaplot(paaTrain,dataTrain,c,451);
     
     sax = saxGen(paaTrain,dataTrain)
     
@@ -98,7 +98,7 @@ function  paaplot(paa,data,c,i)
     hold on
     t=linspace(0,s(2),s(2));
     scatter(t,data(i,:),"filled")
-    ylim([0,100]);
+    ylim([0,65]);
 end
 
 
